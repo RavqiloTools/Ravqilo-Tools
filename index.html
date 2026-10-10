@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10172a">
+<meta name="description" content="Ravqilo Tools - Free online tools for everyday tasks.">
+<title>Ravqilo Tools — Free Online Tools</title>
+<style>
+:root{--bg:#0b1020;--panel:#141c30;--text:#f3f6ff;--muted:#a8b3ca;--blue:#68a4ff;--border:#283550;--green:#56dfb0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif;line-height:1.6}
+header{padding:22px 6%;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-size:25px;font-weight:800;letter-spacing:-1px}
+.logo span{color:var(--blue)}
+.badge{font-size:12px;border:1px solid var(--border);padding:5px 10px;border-radius:20px;color:var(--green)}
+.hero{padding:65px 6% 40px;text-align:center;background:radial-gradient(ellipse at top,#1c3155 0%,var(--bg) 70%)}
+.hero h1{font-size:clamp(32px,7vw,56px);line-height:1.15;margin:0 auto 18px;max-width:750px}
+.hero h1 span{color:var(--blue)}
+.hero p{color:var(--muted);max-width:600px;margin:0 auto 25px}
+.search{width:100%;max-width:540px;padding:15px 18px;border:1px solid var(--border);border-radius:12px;background:var(--panel);color:white;font-size:16px;outline:none}
+main{max-width:1100px;margin:auto;padding:30px 5% 60px}
+.section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.section-title h2{font-size:25px}
+#count{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:15px;padding:19px;cursor:pointer;text-align:left;color:var(--text);transition:.2s;min-height:145px}
+.card:hover{border-color:var(--blue);transform:translateY(-3px)}
+.icon{font-size:25px}
+.card h3{margin:8px 0 4px;font-size:17px}
+.card p{margin:0;color:var(--muted);font-size:13px}
+.workspace{display:none;background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px;margin:25px 0}
+.workspace h2{margin-top:0}
+label{display:block;color:var(--muted);font-size:13px;margin:12px 0 5px}
+input,textarea,select{width:100%;background:#0b1020;color:white;border:1px solid var(--border);border-radius:9px;padding:12px;font-size:15px}
+textarea{min-height:125px;resize:vertical}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+button.primary,button.secondary{padding:11px 17px;border-radius:9px;border:0;cursor:pointer;font-weight:bold}
+.primary{background:var(--blue);color:#071126}
+.secondary{background:#273550;color:white}
+#result{margin-top:17px;padding:14px;background:#0b1020;border:1px solid var(--border);border-radius:10px;overflow-wrap:anywhere;white-space:pre-wrap;min-height:45px}
+footer{text-align:center;padding:28px 15px;border-top:1px solid var(--border);color:var(--muted);font-size:13px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Ravqilo<span>.</span></div>
+  <div class="badge">✦ FREE ONLINE TOOLS</div>
+</header>
+
+<section class="hero">
+  <h1>Simple tools.<br><span>Smarter everyday.</span></h1>
+  <p>Useful online tools to help you work faster. Free to use, right from your browser.</p>
+  <input class="search" id="search" placeholder="🔎 Search 20 free tools..." oninput="filterTools()">
+</section>
+
+<main>
+  <div class="section-title">
+    <h2>Explore Our Tools</h2>
+    <span id="count">20 tools available</span>
+  </div>
+  <div class="grid" id="grid"></div>
+
+  <section class="workspace" id="workspace">
+    <button class="secondary" onclick="closeTool()">← All tools</button>
+    <h2 id="toolTitle">Tool</h2>
+    <p id="toolDesc" style="color:var(--muted)"></p>
+    <div id="fields"></div>
+    <div class="actions">
+      <button class="primary" onclick="runTool()">Run Tool</button>
+      <button class="secondary" onclick="clearTool()">Clear</button>
+      <button class="secondary" id="copyBtn" onclick="copyResult()">Copy Result</button>
+    </div>
+    <div id="result" aria-live="polite">Your result will appear here.</div>
+  </section>
+</main>
+
+<footer>
+  <div class="logo">Ravqilo<span>.</span></div>
+  <p>Free tools for everyone.</p>
+  <p>© <span id="year"></span> Ravqilo Tools. All rights reserved.</p>
+</footer>
+
+<script>
+const tools=[
+{id:"words",icon:"📝",name:"Word Counter",desc:"Count words, characters and sentences.",fields:[["text","Enter your text","textarea"]]},
+{id:"upper",icon:"🔠",name:"Uppercase Converter",desc:"Convert text to uppercase.",fields:[["text","Enter text","textarea"]]},
+{id:"lower",icon:"🔡",name:"Lowercase Converter",desc:"Convert text to lowercase.",fields:[["text","Enter text","textarea"]]},
+{id:"title",icon:"✍️",name:"Title Case Converter",desc:"Capitalize the first letter of every word.",fields:[["text","Enter text","textarea"]]},
+{id:"reverse",icon:"🔄",name:"Text Reverser",desc:"Reverse your text instantly.",fields:[["text","Enter text","textarea"]]},
+{id:"spaces",icon:"🧹",name:"Space Remover",desc:"Remove extra spaces and blank lines.",fields:[["text","Enter text","textarea"]]},
+{id:"duplicates",icon:"📋",name:"Duplicate Line Remover",desc:"Remove repeated lines from text.",fields:[["text","Enter lines","textarea"]]},
+{id:"sort",icon:"↕️",name:"Line Sorter",desc:"Sort lines alphabetically.",fields:[["text","Enter lines","textarea"]]},
+{id:"slug",icon:"🔗",name:"Slug Generator",desc:"Create a URL-friendly text slug.",fields:[["text","Enter title","text"]]},
+{id:"urlencode",icon:"🌐",name:"URL Encoder",desc:"Encode text for use in URLs.",fields:[["text","Enter text","textarea"]]},
+{id:"urldecode",icon:"🔓",name:"URL Decoder",desc:"Decode URL-encoded text.",fields:[["text","Enter encoded text","textarea"]]},
+{id:"b64encode",icon:"🔐",name:"Base64 Encoder",desc:"Encode text into Base64 format.",fields:[["text","Enter text","textarea"]]},
+{id:"b64decode",icon:"🔑",name:"Base64 Decoder",desc:"Decode Base64 text.",fields:[["text","Enter Base64","textarea"]]},
+{id:"json",icon:"{ }",name:"JSON Formatter",desc:"Validate and format JSON data.",fields:[["text","Paste JSON","textarea"]]},
+{id:"password",icon:"🛡️",name:"Password Generator",desc:"Generate a random password.",fields:[["length","Password length (8–64)","number"]]},
+{id:"random",icon:"🎲",name:"Random Number",desc:"Generate a random number in your range.",fields:[["min","Minimum number","number"],["max","Maximum number","number"]]},
+{id:"percent",icon:"％",name:"Percentage Calculator",desc:"Calculate a percentage of a number.",fields:[["percent","Percentage (%)","number"],["number","Number","number"]]},
+{id:"age",icon:"🎂",name:"Age Calculator",desc:"Calculate age from your date of birth.",fields:[["dob","Date of birth","date"]]},
+{id:"bmi",icon:"⚖️",name:"BMI Calculator",desc:"Estimate body mass index using metric units.",fields:[["weight","Weight (kg)","number"],["height","Height (cm)","number"]]},
+{id:"calc",icon:"🧮",name:"Basic Calculator",desc:"Calculate two numbers using an operator.",fields:[["a","First number","number"],["op","Operator (+, -, *, /)","select"],["b","Second number","number"]]}
+];
+let current=null;
+const $=id=>document.getElementById(id);
+
+function render(list=tools){
+$("grid").innerHTML=list.map(t=>`<button class="card" onclick="openTool('${t.id}')"><div class="icon">${t.icon}</div><h3>${t.name}</h3><p>${t.desc}</p></button>`).join("");
+$("count").textContent=list.length+" tools available";
+}
+function filterTools(){
+const q=$("search").value.toLowerCase();
+render(tools.filter(t=>(t.name+" "+t.desc).toLowerCase().includes(q)));
+}
+function openTool(id){
+current=tools.find(t=>t.id===id);
+$("toolTitle").textContent=current.icon+" "+current.name;
+$("toolDesc").textContent=current.desc;
+$("fields").innerHTML=current.fields.map(([id,label,type])=>{
+if(type==="select")return `<label>${label}</label><select id="f_${id}"><option>+</option><option>-</option><option>*</option><option>/</option></select>`;
+return `<label>${label}</label><${type==="textarea"?"textarea":"input"} id="f_${id}" ${type==="textarea"?"":`type="${type}"`} ${type==="number"?'step="any"':''} placeholder="${label}"></${type==="textarea"?"textarea":"input"}>`;
+}).join("");
+$("workspace").style.display="block";
+$("result").textContent="Your result will appear here.";
+$("workspace").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function val(id){return $("f_"+id).value}
+function runTool(){
+try{
+let r="",text=()=>val("text");
+switch(current.id){
+case"words":{
+let s=text(),w=s.trim()?s.trim().split(/\s+/).length:0;
+r=`Words: ${w}\nCharacters (with spaces): ${s.length}\nCharacters (without spaces): ${s.replace(/\s/g,"").length}\nSentences: ${s.trim()?s.split(/[.!?]+/).filter(x=>x.trim()).length:0}`;break}
+case"upper":r=text().toUpperCase();break;
+case"lower":r=text().toLowerCase();break;
+case"title":r=text().toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());break;
+case"reverse":r=Array.from(text()).reverse().join("");break;
+case"spaces":r=text().split("\n").map(s=>s.trim().replace(/\s+/g," ")).filter(Boolean).join("\n");break;
+case"duplicates":r=[...new Set(text().split("\n"))].join("\n");break;
+case"sort":r=text().split("\n").sort((a,b)=>a.localeCompare(b)).join("\n");break;
+case"slug":r=text().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");break;
+case"urlencode":r=encodeURIComponent(text());break;
+case"urldecode":r=decodeURIComponent(text());break;
+case"b64encode":r=btoa(unescape(encodeURIComponent(text())));break;
+case"b64decode":r=decodeURIComponent(escape(atob(text().trim())));break;
+case"json":r=JSON.stringify(JSON.parse(text()),null,2);break;
+case"password":{
+let n=Number(val("length"));if(!Number.isInteger(n)||n<8||n>64)throw Error("Choose a length between 8 and 64.");
+let chars="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*?";
+let arr=new Uint32Array(n);crypto.getRandomValues(arr);r=Array.from(arr,x=>chars[x%chars.length]).join("");break}
+case"random":{
+let a=Number(val("min")),b=Number(val("max"));if(!Number.isInteger(a)||!Number.isInteger(b)||a>b)throw Error("Enter valid whole numbers. Minimum must not exceed maximum.");
+if(b-a>1000000000000)throw Error("Range is too large.");
+r=String(Math.floor(Math.random()*(b-a+1))+a);break}
+case"percent":{
+let p=Number(val("percent")),n=Number(val("number"));if(val("percent")===""||val("number")==="")throw Error("Fill in both numbers.");
+r=`${p}% of ${n} = ${(p/100*n).toLocaleString(undefined,{maximumFractionDigits:8})}`;break}
+case"age":{
+let d=new Date(val("dob")),now=new Date();if(!val("dob")||isNaN(d)||d>now)throw Error("Enter a valid date of birth in the past.");
+let age=now.getFullYear()-d.getFullYear();if(now.getMonth()<d.getMonth()||(now.getMonth()===d.getMonth()&&now.getDate()<d.getDate()))age--;
+r=`Your age is ${age} years.`;break}
+case"bmi":{
+let w=Number(val("weight")),h=Number(val("height"))/100;if(w<=0||h<=0||!isFinite(w+h))throw Error("Enter valid positive weight and height.");
+let bmi=w/(h*h);r=`BMI: ${bmi.toFixed(1)}\nThis is a screening estimate, not a diagnosis.`;break}
+case"calc":{
+let a=Number(val("a")),b=Number(val("b")),op=val("op");if(val("a")===""||val("b")==="")throw Error("Enter both numbers.");
+if(op==="/"&&b===0)throw Error("Cannot divide by zero.");
+r=String(({"+":()=>a+b,"-":()=>a-b,"*":()=>a*b,"/":()=>a/b})[op]());break}
+}
+$("result").textContent=r;
+}catch(e){$("result").textContent="Error: "+e.message}
+}
+function clearTool(){
+current.fields.forEach(([id])=>{const el=$("f_"+id);if(el)el.value=""});
+$("result").textContent="Your result will appear here.";
+}
+async function copyResult(){
+const s=$("result").textContent;
+try{await navigator.clipboard.writeText(s);$("copyBtn").textContent="Copied!";setTimeout(()=>$("copyBtn").textContent="Copy Result",1500)}
+catch(e){$("result").focus?.();alert("Please select and copy the result manually.")}
+}
+function closeTool(){$("workspace").style.display="none";current=null;window.scrollTo({top:0,behavior:"smooth"})}
+$("year").textContent=new Date().getFullYear();
+render();
+</script>
+</body>
+</html>
